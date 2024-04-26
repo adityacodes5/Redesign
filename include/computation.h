@@ -2,6 +2,7 @@
 
 class computation{
     private:
+    
         double gearRatio; // Declare gearRatio as a nonstatic data member
         double wheelCircumference;
 

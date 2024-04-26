@@ -4,10 +4,8 @@ using namespace vex;
 
 //FILL OUT CONSTRUCTOR
 //SET ALL CONSTANT VALUES IN "projectID.h"
-timer myTimer;
-processID process;
-robotID robot;
-computation Computation(robot.gearRatio, robot.wheelCircumference);
+
+computation Computation(robotID.gearRatio, robotID.wheelCircumference);
 drive::drive(){};
 
 void drive::move(directionType dir, double veloL, double veloR){
@@ -46,6 +44,12 @@ double drive::rightDriveRotation(){
 
 }
 
+double drive::averageDriveRotation(){
+
+    return (leftDriveRotation() + rightDriveRotation())/2;
+
+}
+
 void drive::resetDegreePosition(){
 
     leftDrive.resetPosition();
@@ -55,7 +59,10 @@ void drive::resetDegreePosition(){
 
 void drive::autoDrive(){
 
-    if (abs(rightAxisPCT) > 5 || abs(leftAxisPCT) > 5){
+    rightAxisPCT = Controller.Axis3.position(percent) + Controller.Axis4.position(percent);
+    leftAxisPCT = Controller.Axis3.position(percent) - Controller.Axis4.position(percent);
+
+    if (fabs(rightAxisPCT) > 5 || fabs(leftAxisPCT) > 5){
 
         move(forward, leftAxisPCT, rightAxisPCT);
 
@@ -67,6 +74,7 @@ void drive::autoDrive(){
 
     }
 }
+
 
 
 

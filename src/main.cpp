@@ -15,7 +15,7 @@ using namespace vex;
 
 competition Competition;
 drive Drive;
-processID Process;
+
 //
 
 
@@ -61,7 +61,7 @@ void usercontrol(void) {
   while (1) {
     Drive.autoDrive();
 
-    vexDelay(Process.deltaTime); //Delay loop to avoid overload
+    vexDelay(processID.deltaTime); //Delay loop to avoid overload
 
   }
 }
