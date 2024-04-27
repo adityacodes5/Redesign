@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPUTATION_H
+#define COMPUTATION_H
 
 class computation{
     private:
@@ -18,3 +19,5 @@ class computation{
         velocityUnits voltageToPercent(double voltage_mV);
         voltageUnits percentToVoltage(double percent);
 };
+
+#endif //COMPUTATION_H

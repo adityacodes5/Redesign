@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DRIVE_H
+#define DRIVE_H
 
 class drive{
     private:
@@ -21,3 +22,5 @@ class drive{
 
         
 };
+
+#endif //DRIVE_H

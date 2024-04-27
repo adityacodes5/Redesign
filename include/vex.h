@@ -11,6 +11,7 @@
 #include "computation.h"
 #include "drive.h"
 #include "PID.h"
+#include "gyro.h"
 
 
 

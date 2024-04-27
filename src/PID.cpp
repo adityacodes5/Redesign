@@ -3,6 +3,7 @@
 
 computation Compute(robotID.gearRatio, robotID.wheelCircumference);
 drive Driving;
+gyro Gyro;
 
 PID::PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout):
     error(error), 

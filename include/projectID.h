@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PROJECTID_H
+#define PROJECTID_H
 
 struct{
 
@@ -19,3 +20,4 @@ struct{
 
 } processID;
 
+#endif //PROJECTID.H
