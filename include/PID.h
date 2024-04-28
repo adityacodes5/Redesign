@@ -1,6 +1,7 @@
 #ifndef PID_H
 #define PID_H
 
+
 class PID{
     public:
 
@@ -29,6 +30,7 @@ class PID{
         double motorSpeed;
         double leftSpeed;
         double rightSpeed;
+        double targetHeadingError;
 
         PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout);
 
@@ -39,6 +41,8 @@ class PID{
         bool isSettled();
 
         void moveFor(double inches, double settleTime, double timeout);
+
+        void continuousTurn(double targetHeading, bool leftTurn, double setHeading, bool overwriteHeading, double settleTime, double timeout);
 
 
 

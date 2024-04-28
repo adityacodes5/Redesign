@@ -3,7 +3,7 @@
 
 computation Compute(robotID.gearRatio, robotID.wheelCircumference);
 drive Driving;
-gyro Gyro;
+gyroData Gyro;
 
 PID::PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout):
     error(error), 
@@ -68,6 +68,7 @@ void PID::setValues(double error = 0, double kP = 0, double kI = 0, double kD = 
     this-> motorSpeed = 0;
     this-> leftSpeed = 0;
     this-> rightSpeed = 0;
+    this-> targetHeadingError = 0;
 
     Driving.resetDegreePosition();
 }
@@ -122,5 +123,42 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
     }
 
     Driving.brake(coast); //Brakes the motors
+
+}
+
+void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading = 0, bool overwriteHeading = false, double settleTime = TBD, double timeout = TBD){
+    setValues(0, TBD, TBD, TBD, TBD, TBD, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
+
+    if(overwriteHeading){
+        gyroscope.setHeading(setHeading, rotationUnits::deg);
+    }
+
+    if(!leftTurn && gyroscope.heading() > targetHeading){
+        targetHeadingError = targetHeading + 360;
+    }
+
+    if(leftTurn && gyroscope.heading() < targetHeading){
+        targetHeadingError = targetHeading - 360;
+    }
+
+    if(overwriteHeading){
+        gyroscope.setHeading(setHeading, rotationUnits::deg);
+    }
+
+    while(!isSettled()){
+        if(!leftTurn){
+            degreesError = targetHeadingError - gyroscope.heading();
+            motorSpeed = compute(degreesError); //Calculates the motor speed
+            Driving.move(fwd, motorSpeed, -motorSpeed); //Moves the motors
+        }
+        else if(leftTurn){
+            degreesError = fabs(-targetHeadingError + gyroscope.heading());
+            motorSpeed = compute(degreesError); //Calculates the motor speed
+            Driving.move(fwd, -motorSpeed, motorSpeed); //Moves the motors
+        }
+
+        vexDelay(deltaTime); //Delay loop to avoid overload
+    }
+
 
 }

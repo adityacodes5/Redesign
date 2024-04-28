@@ -1,8 +1,8 @@
 #include <vex.h>
 
-gyro::gyro(){}
+gyroData::gyroData(){}
 
-void gyro::calibrate(){
+void gyroData::calibrate(){
 
     gyroscope.calibrate();
 
@@ -13,7 +13,7 @@ void gyro::calibrate(){
     }
 }
 
-void gyro::resetHeading(bool leftTurn){
+void gyroData::resetHeading(bool leftTurn){
 
     gyroscope.setHeading(0.1, rotationUnits::deg);
 
@@ -26,7 +26,7 @@ void gyro::resetHeading(bool leftTurn){
 
 }
 
-double gyro::getHeading(){
+double gyroData::getHeading(){
 
    return gyroscope.heading();
 

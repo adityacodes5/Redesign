@@ -11,6 +11,8 @@ extern motor backRight;
 extern motor middleLeft;
 extern motor middleRight;
 
+extern inertial gyroscope;
+
 
 extern motor_group leftDrive;
 extern motor_group rightDrive;
