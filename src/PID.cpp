@@ -34,7 +34,7 @@ double PID::compute(double error){
     if(fabs(error) < settleError){
         timeSpentSettled += 10;
     }
-
+    
     else{
         timeSpentSettled = 0;
     }
@@ -70,7 +70,7 @@ void PID::setValues(double error = 0, double kP = 0, double kI = 0, double kD = 
     this-> rightSpeed = 0;
     this-> targetHeadingError = 0;
 
-    Driving.resetDegreePosition();
+    //Driving.resetDegreePosition();
 }
 
 bool PID::isSettled(){
@@ -95,18 +95,19 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
 
     degreesError = (inches*360)/(wheelCircumference*gearRatio); //Converts inches to degrees
 
+    resetDegree = Driving.averageDriveRotation(); //Resets the degree position
 
     while(!isSettled()){
 
         if(inches >= 0){
 
-            error = degreesError - Driving.averageDriveRotation();
+            error = degreesError - Driving.averageDriveRotation() + resetDegree;
 
         }
 
         if(inches < 0){
 
-            error = degreesError + Driving.averageDriveRotation();
+            error = degreesError + Driving.averageDriveRotation() - resetDegree;
 
         }
         
@@ -129,6 +130,14 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
 void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading = 0, bool overwriteHeading = false, double settleTime = TBD, double timeout = TBD){
     setValues(0, TBD, TBD, TBD, TBD, TBD, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
 
+    if(gyroscope.heading() < 1 && gyroscope.heading() >= 0){ //To avoid 360/0 glitch
+        gyroscope.setHeading(1, rotationUnits::deg);
+    }
+
+    if(gyroscope.heading() > 359 && gyroscope.heading() < 360){ //To avoid 360/0 glitch
+        gyroscope.setHeading(359, rotationUnits::deg);
+    }
+
     if(overwriteHeading){
         gyroscope.setHeading(setHeading, rotationUnits::deg);
     }
@@ -144,6 +153,7 @@ void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading 
     if(overwriteHeading){
         gyroscope.setHeading(setHeading, rotationUnits::deg);
     }
+
 
     while(!isSettled()){
         if(!leftTurn){

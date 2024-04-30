@@ -54,3 +54,7 @@ velocityUnits computation::voltageToPercent(double voltage_mV){
 voltageUnits computation::percentToVoltage(double percent){
     return voltageUnits((percent/100)*12000);
 }
+
+double computation::headingToBearing(double heading){
+    return 360 - heading + 90;
+}

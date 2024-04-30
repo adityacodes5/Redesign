@@ -31,3 +31,11 @@ double gyroData::getHeading(){
    return gyroscope.heading();
 
 }
+
+double gyroData::getBearing(){
+
+    return (
+        360 - (gyroscope.heading()) + 90
+    );
+
+}

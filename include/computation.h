@@ -18,6 +18,7 @@ class computation{
         double voltageLimit(double voltage_mV);
         velocityUnits voltageToPercent(double voltage_mV);
         voltageUnits percentToVoltage(double percent);
+        double headingToBearing(double heading);
 };
 
 #endif //COMPUTATION_H

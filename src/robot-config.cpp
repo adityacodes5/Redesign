@@ -2,8 +2,6 @@
 #define no_port PORT22
 
 using namespace vex;
-using signature = vision::signature;
-using coade = vision::code;
 
 
 brain Brain;

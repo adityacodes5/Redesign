@@ -21,7 +21,7 @@ class PID{
         double timeout;
         double degreesError;
         
-
+        double resetDegree;
         double accumulatedError;
         double previousError;
         double output;
