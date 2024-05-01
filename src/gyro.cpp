@@ -39,3 +39,14 @@ double gyroData::getBearing(){
     );
 
 }
+
+void gyroData::errorCalibrate(){
+
+    if(gyroscope.heading() < 1 && gyroscope.heading() >= 0){ //To avoid 360/0 glitch
+        gyroscope.setHeading(1, rotationUnits::deg);
+    }
+
+    if(gyroscope.heading() > 359 && gyroscope.heading() < 360){ //To avoid 360/0 glitch
+        gyroscope.setHeading(359, rotationUnits::deg);
+    }   
+}

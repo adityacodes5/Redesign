@@ -15,8 +15,10 @@ using namespace vex;
 
 competition Competition;
 drive Drive;
+odom Odom;
 
 //
+
 
 
 // -- PREAUTONOMOUS FUNCTION --
@@ -24,9 +26,15 @@ drive Drive;
 // This function is run before the game starts and is used to set up the robot. It runs when the code is activated,
 // but the game has not begun yet. This is where you can set up the robot's starting position, sensors, etc.
 
+void positionUpdateThread() {
+    Odom.updatePosition(0, 0, 90);
+}
+
+
 void pre_auton(void) {
 
   //Brain.Screen.drawImageFromFile("Untitled-1.png", 0, 0);
+  thread positionUpdate(positionUpdateThread);
 
 }
 

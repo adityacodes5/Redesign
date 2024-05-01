@@ -56,5 +56,19 @@ voltageUnits computation::percentToVoltage(double percent){
 }
 
 double computation::headingToBearing(double heading){
-    return 360 - heading + 90;
+    double bearing = 90 - heading;
+
+    if (bearing < 0) {
+        bearing += 360;
+    }
+
+    return bearing;
+}
+
+double computation::bearingToHeading(double bearing){
+    double heading = 90 - bearing;
+    if (heading < 0) {
+        heading += 360;
+    }
+    return heading;
 }

@@ -1,5 +1,6 @@
 #ifndef ODOM_H
 #define ODOM_H
+using namespace std;
 
 
 class odom{

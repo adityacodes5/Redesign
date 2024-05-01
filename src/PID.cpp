@@ -4,6 +4,7 @@
 computation Compute(robotID.gearRatio, robotID.wheelCircumference);
 drive Driving;
 gyroData Gyro;
+odom Odometry;
 
 PID::PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout):
     error(error), 
@@ -70,7 +71,7 @@ void PID::setValues(double error = 0, double kP = 0, double kI = 0, double kD = 
     this-> rightSpeed = 0;
     this-> targetHeadingError = 0;
 
-    //Driving.resetDegreePosition();
+    Driving.resetDegreePosition();
 }
 
 bool PID::isSettled(){
@@ -130,17 +131,7 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
 void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading = 0, bool overwriteHeading = false, double settleTime = TBD, double timeout = TBD){
     setValues(0, TBD, TBD, TBD, TBD, TBD, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
 
-    if(gyroscope.heading() < 1 && gyroscope.heading() >= 0){ //To avoid 360/0 glitch
-        gyroscope.setHeading(1, rotationUnits::deg);
-    }
-
-    if(gyroscope.heading() > 359 && gyroscope.heading() < 360){ //To avoid 360/0 glitch
-        gyroscope.setHeading(359, rotationUnits::deg);
-    }
-
-    if(overwriteHeading){
-        gyroscope.setHeading(setHeading, rotationUnits::deg);
-    }
+    Gyro.errorCalibrate();
 
     if(!leftTurn && gyroscope.heading() > targetHeading){
         targetHeadingError = targetHeading + 360;
@@ -156,6 +147,7 @@ void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading 
 
 
     while(!isSettled()){
+
         if(!leftTurn){
             degreesError = targetHeadingError - gyroscope.heading();
             motorSpeed = compute(degreesError); //Calculates the motor speed
@@ -170,5 +162,32 @@ void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading 
         vexDelay(deltaTime); //Delay loop to avoid overload
     }
 
+}
+
+void PID::moveTo(double targetX, double targetY, double settleTime = TBD, double timeout = TBD){
+    
+    errorX = targetX - Odometry.x;
+    errorY = targetY - Odometry.y;
+
+    if(errorX != 0){
+        targetAngle = Compute.bearingToHeading(atan(errorY/errorX));
+    }
+   
+
+    if((fabs(gyroscope.heading() - targetAngle) >= fabs(360-targetAngle+gyroscope.heading()))){
+        leftTurn = true;
+    }
+
+    else if((fabs(gyroscope.heading() - targetAngle) < fabs(360-targetAngle+gyroscope.heading()))){
+        leftTurn = false;
+    }
+
+    continuousTurn(targetAngle, leftTurn);
+
+    Driving.resetDegreePosition();
+
+    targetDist = sqrt(pow(errorX, 2) + pow(errorY, 2));
+
+    moveFor(targetDist);
 
 }

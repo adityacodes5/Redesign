@@ -17,22 +17,26 @@ void odom::updatePosition(double initialX, double initialY, double initialHeadin
     y = initialY;
     heading = initialHeading;
 
-    bearing = GyroData.getBearing() + comp.headingToBearing(heading);
+    while(true){
+        bearing = GyroData.getBearing() + comp.headingToBearing(heading);
 
-    if (bearing > 360){
-        bearing -= 360;
+        if (bearing > 360){
+            bearing -= 360;
+        }
+
+        else if (bearing < 0){
+            bearing += 360;
+        }
+
+        centerPos = comp.inchesToDegrees(drivingData.averageDriveRotation());
+        deltaCenter = centerPos - prevCenterPos;
+
+        drivingData.averageDriveRotation();
+
+        x += cos(bearing * degToRad) * deltaCenter;
+        y += sin(bearing * degToRad) * deltaCenter;
+
+        this_thread::sleep_for(processID.deltaTime);
     }
-
-    else if (bearing < 0){
-        bearing += 360;
-    }
-
-    centerPos = comp.inchesToDegrees(drivingData.averageDriveRotation());
-    deltaCenter = centerPos - prevCenterPos;
-    
-    drivingData.averageDriveRotation();
-
-    x += cos(bearing * degToRad) * deltaCenter;
-    y += sin(bearing * degToRad) * deltaCenter;
 }
 

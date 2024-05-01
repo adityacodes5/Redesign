@@ -19,6 +19,7 @@ class computation{
         velocityUnits voltageToPercent(double voltage_mV);
         voltageUnits percentToVoltage(double percent);
         double headingToBearing(double heading);
+        double bearingToHeading(double bearing);
 };
 
 #endif //COMPUTATION_H

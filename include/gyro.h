@@ -9,6 +9,7 @@ class gyroData{
         void resetHeading(bool leftTurn);
         double getHeading();
         double getBearing();
+        void errorCalibrate();
 };
 
 #endif //GYRO_H
