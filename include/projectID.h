@@ -3,8 +3,8 @@
 
 struct{
 
-    const double gearRatio = 0; //speed:torque
-    const double wheelCircumference = 0; //in
+    const double gearRatio = 1.5; //speed:torque
+    const double wheelCircumference = 4*M_PI; //in
     const double driveBase = 12; //in
     const int maxVelocity = 100; //pct
     const int maxVoltage = 12000; //mV

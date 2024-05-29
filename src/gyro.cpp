@@ -33,12 +33,9 @@ double gyroData::getHeading(){
 }
 
 double gyroData::getBearing(){
-
-    return (
-        360 - (gyroscope.heading()) + 90
-    );
-
+    return (450 - gyroscope.heading());
 }
+
 
 void gyroData::errorCalibrate(){
 

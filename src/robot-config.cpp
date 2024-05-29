@@ -16,21 +16,21 @@ controller Controller;
 */
 
 //Drive motors (4 motors)
-motor frontLeft = motor(no_port, ratio18_1, false);
-motor frontRight = motor(no_port, ratio18_1, true);
+motor frontLeft = motor(PORT16, ratio18_1, true);
+motor frontRight = motor(PORT10, ratio18_1, false);
 
-motor backLeft = motor(no_port, ratio18_1, false);
-motor backRight = motor(no_port, ratio18_1, true);
+motor backLeft = motor(PORT7, ratio18_1, true);
+motor backRight = motor(PORT5, ratio18_1, false);
 
 //Drive motors (if 6 motor)
-motor middleLeft = motor(no_port, ratio18_1, false);
-motor middleRight = motor(no_port, ratio18_1, true);
+motor middleLeft = motor(PORT15, ratio18_1, false);
+motor middleRight = motor(PORT9, ratio18_1, true);
 
 motor_group leftDrive = motor_group(frontLeft, middleLeft, backLeft);
 motor_group rightDrive = motor_group(frontRight, middleRight, backRight);
 //Gyroscope
 
-inertial gyroscope = inertial(no_port);
+inertial gyroscope = inertial(PORT3);
 
 
 

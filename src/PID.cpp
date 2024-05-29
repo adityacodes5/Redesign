@@ -1,21 +1,24 @@
 #include <vex.h>
 #define TBD NULL
 
+using namespace std;
+
 computation Compute(robotID.gearRatio, robotID.wheelCircumference);
 drive Driving;
 gyroData Gyro;
 odom Odometry;
+PID::PID(){};
 
-PID::PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout):
-    error(error), 
-    kP(kP), 
-    kI(kI), 
-    kD(kD), 
-    startIntegral(startIntegral), 
-    settleError(settleError), 
-    settleTime(settleTime), 
-    timeout(timeout)
-{};
+//PID::PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout):
+    //error(error), 
+    //kP(kP), 
+    //kI(kI), 
+    //kD(kD), 
+    //startIntegral(startIntegral), 
+    //settleError(settleError), 
+    //settleTime(settleTime), 
+    //timeout(timeout)
+//{};
 
 
 double PID::compute(double error){
@@ -92,8 +95,23 @@ bool PID::isSettled(){
 
 
 void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000){
-    setValues(inches, TBD, TBD, TBD, TBD, TBD, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
+    setValues(inches, .5, 2, 1.2, 0, 15, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
 
+    if(inches >= 36){
+        kP = .5;
+        kI = 2;
+        kD = 1.2;
+    }
+    if(inches < 36 && inches >= 18){
+        kP = .42;
+        kI = 2;
+        kD = .9;
+    }
+    if(inches < 18){
+        kP = .36;
+        kI = 2;
+        kD = 1.2;
+    }
     degreesError = (inches*360)/(wheelCircumference*gearRatio); //Converts inches to degrees
 
     resetDegree = Driving.averageDriveRotation(); //Resets the degree position
@@ -102,7 +120,7 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
 
         if(inches >= 0){
 
-            error = degreesError - Driving.averageDriveRotation() + resetDegree;
+            error = degreesError - Driving.averageDriveRotation() - resetDegree;
 
         }
 
@@ -128,63 +146,68 @@ void PID::moveFor(double inches, double settleTime = 300, double timeout = 4000)
 
 }
 
-void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading = 0, bool overwriteHeading = false, double settleTime = TBD, double timeout = TBD){
-    setValues(0, TBD, TBD, TBD, TBD, TBD, settleTime, timeout); //Sets the values for the PID (error, settleTime, timeout
-
-    Gyro.errorCalibrate();
-
-    if(!leftTurn && gyroscope.heading() > targetHeading){
-        targetHeadingError = targetHeading + 360;
-    }
-
-    if(leftTurn && gyroscope.heading() < targetHeading){
-        targetHeadingError = targetHeading - 360;
-    }
-
-    if(overwriteHeading){
+void PID::continuousTurn(double targetHeading, bool leftTurn, double setHeading = 0, bool overwriteHeading = false, double settleTime = TBD, double timeout = TBD) {
+    setValues(0, 0.55, 0.001, 0.25, 5, 1, settleTime, timeout); // Set PID values (example values, adjust as needed)
+    
+    if(overwriteHeading) {
         gyroscope.setHeading(setHeading, rotationUnits::deg);
     }
 
+    const double MIN_SPEED = 5;
 
-    while(!isSettled()){
+    while(!isSettled()) {
+        double currentHeading = gyroscope.heading();
+        degreesError = targetHeading - currentHeading;
 
-        if(!leftTurn){
-            degreesError = targetHeadingError - gyroscope.heading();
-            motorSpeed = compute(degreesError); //Calculates the motor speed
-            Driving.move(fwd, motorSpeed, -motorSpeed); //Moves the motors
+        // Handle wrap-around
+        if(degreesError > 180) {
+            degreesError -= 360;
+        } else if(degreesError < -180) {
+            degreesError += 360;
         }
-        else if(leftTurn){
-            degreesError = fabs(-targetHeadingError + gyroscope.heading());
-            motorSpeed = compute(degreesError); //Calculates the motor speed
-            Driving.move(fwd, -motorSpeed, motorSpeed); //Moves the motors
+
+        error = degreesError;
+        motorSpeed = compute(error);
+    
+
+        if (fabs(motorSpeed) < MIN_SPEED) {
+            motorSpeed = (motorSpeed > 0) ? MIN_SPEED : -MIN_SPEED;
         }
 
-        vexDelay(deltaTime); //Delay loop to avoid overload
+        if(leftTurn) {
+            Driving.move(fwd, -motorSpeed, motorSpeed);
+        } else {
+            Driving.move(fwd, motorSpeed, -motorSpeed);
+        }
+
+        vexDelay(10);
     }
 
+    Driving.brake(coast);
 }
+
 
 void PID::moveTo(double targetX, double targetY, double settleTime = TBD, double timeout = TBD){
     
     errorX = targetX - Odometry.x;
     errorY = targetY - Odometry.y;
 
-    if(errorX != 0){
-        targetAngle = Compute.bearingToHeading(atan(errorY/errorX));
+    if (errorX != 0) {
+        targetAngle = Odometry.radToDeg * atan(errorY / errorX);
+        if (errorX < 0) {
+            // Adjust the angle based on the quadrant
+            targetAngle += 180.0; // Quadrants 2 and 3
+        }
+    } else {
+        // Handle special cases when errorX is zero
+        if (errorY > 0) {
+            targetAngle = 90.0; // Quadrant 1
+        } else if (errorY < 0) {
+            targetAngle = -90.0; // Quadrant 4
+        }
     }
-   
 
-    if((fabs(gyroscope.heading() - targetAngle) >= fabs(360-targetAngle+gyroscope.heading()))){
-        leftTurn = true;
-    }
-
-    else if((fabs(gyroscope.heading() - targetAngle) < fabs(360-targetAngle+gyroscope.heading()))){
-        leftTurn = false;
-    }
-
-    continuousTurn(targetAngle, leftTurn);
-
-    Driving.resetDegreePosition();
+    continuousTurn(Compute.bearingToHeading(targetAngle), false);
 
     targetDist = sqrt(pow(errorX, 2) + pow(errorY, 2));
 

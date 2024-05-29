@@ -7,6 +7,7 @@ class odom{
     public:
         odom();
         const double degToRad = M_PI / 180;
+        const double radToDeg = 180 / M_PI;
 
         double x;
         double y;
@@ -16,7 +17,7 @@ class odom{
         double prevCenterPos;
         double deltaCenter;
 
-        void updatePosition(double initialX, double initialY, double initialHeading);
+        void updatePosition(double initialX, double initialY);
 };
 
 #endif // ODOM_H

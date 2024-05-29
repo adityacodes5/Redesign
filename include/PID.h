@@ -43,8 +43,8 @@ class PID{
         double targetDist;
         //TODO RESET THESE VALUES
         
-
-        PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout);
+        PID();
+        //PID(double error, double kP, double kI, double kD, double startIntegral, double settleError, double settleTime, double timeout);
 
         double compute(double error);
 

@@ -60,8 +60,8 @@ void drive::resetDegreePosition(){
 
 void drive::autoDrive(){ //Drive function for arcade drive
 
-    rightAxisPCT = Controller.Axis3.position(percent) + Controller.Axis4.position(percent);
-    leftAxisPCT = Controller.Axis3.position(percent) - Controller.Axis4.position(percent);
+    rightAxisPCT = Controller.Axis3.position(percent) - Controller.Axis4.position(percent);
+    leftAxisPCT = Controller.Axis3.position(percent) + Controller.Axis4.position(percent);
 
     if (fabs(rightAxisPCT) > 5 || fabs(leftAxisPCT) > 5){ //Deadzone for joystick, joystick must be moved more then 5% to activate drive
 
